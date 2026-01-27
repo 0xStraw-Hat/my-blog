@@ -1,0 +1,4 @@
+baseURL = 'https://0xStrawHat.github.io/'
+languageCode = 'en-us'
+title = '0xStrawHat Blog'
+theme= "hugo-theme-reimu"
