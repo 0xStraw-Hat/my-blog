@@ -1,7 +1,3 @@
-[submodule "0xStrawHat-Blog/0xStrawHat.github.io"]
-	path = 0xStrawHat-Blog/0xStrawHat.github.io
-	url = https://github.com/0xStraw-Hat/0xStrawHat.github.io.git
-	branch = main
 [submodule "0xStrawHat-Blog/public/0xStrawHat.github.io"]
 	path = 0xStrawHat-Blog/public/0xStrawHat.github.io
 	url = https://github.com/0xStraw-Hat/0xStrawHat.github.io.git
