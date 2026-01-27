@@ -1,0 +1,187 @@
+{{- $params := .Site.Params -}}
+<div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+    {{- range .Site.Params.menu -}}
+      <a class="main-nav-link-wrap" href="{{ .url | relLangURL }}">
+        {{- if ne .icon false -}}
+          <div class='main-nav-icon icon {{ if or (and (eq .icon "e62b") ($params.icon_font)) (and (eq .icon "f6ad") (not $params.icon_font)) (not .icon) }}rotate{{ end }}'>
+            {{- if .icon -}}
+              {{- if and (strings.Contains .icon ".") (strings.Contains .icon "/") -}}
+                <img src="{{ .icon | relURL }}" alt="{{ .name }} icon" class="" style="height: 1em;">
+              {{- else -}}
+                &#x{{- .icon -}};
+              {{- end -}}
+            {{- else -}}
+              {{- if $params.icon_font -}}
+                &#xe62b;
+              {{- else -}}
+                &#xf6ad;
+              {{- end -}}
+            {{- end -}}
+          </div>
+        {{- end -}}
+        <span class="main-nav-link">{{ i18n .name }}</span>
+      </a>
+    {{- end -}}
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+    {{- if or .Site.Params.algolia_search.enable .Site.Params.local_search.enable -}}
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="{{ i18n "search" }}" aria-label="{{ i18n "search" }}" style="display: flex; align-items: center; justify-content: center;">
+         <i class="fas fa-search" style="color:white;"></i>
+      </a>
+    {{- end -}}
+  </nav>
+  {{- if and hugo.IsMultilingual (ne "404" .Type) -}}
+    {{- $i18nMap := dict -}}
+    {{- range .Site.Languages -}}
+      {{- $i18nMap = merge $i18nMap (dict .Lang .LanguageName) -}}
+    {{- end -}}
+    <nav id="i18n-nav" aria-label="Language selection">
+      <div class="custom-dropdown">
+        <div class="select-selected" id="select-selected" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Language menu">
+          <span id="nav-language-btn" class="nav-icon" style="padding: 0 20px 0 0"></span>
+          <span id="selected-lang">{{ index $i18nMap $.Language.Lang }}</span>
+        </div>
+        <ul class="select-items" id="select-items" role="listbox" aria-label="Languages">
+          {{- range .Site.Languages -}}
+            <li data-value="{{ .Lang }}" role="option" {{ if eq $.Language.Lang .Lang }}class="selected" arial-selected="true"{{ else }}arial-selected="false"{{ end }} >{{ .LanguageName }}</li>
+          {{- end -}}
+        </ul>
+      </div>
+      <script>
+        var selectSelected = document.getElementById("select-selected");
+        var selectedLang = document.getElementById("selected-lang");
+        var selectItems = document.getElementById("select-items");
+        var selectOptions = selectItems.querySelectorAll("li");
+
+        selectSelected.addEventListener("click", () => {
+          selectItems.classList.toggle("show");
+          var expanded = selectSelected.getAttribute("aria-expanded") === "true";
+          selectSelected.setAttribute("aria-expanded", (!expanded).toString());
+        });
+
+        selectOptions.forEach((item) => {
+          item.addEventListener("click", () => {
+            const langMap = {};
+            {{- with .Translations -}}
+              {{- range . -}}
+              langMap['{{ .Language.Lang }}'] = '{{ .RelPermalink }}'; 
+              {{- end -}}
+            {{- end -}}
+            selectedLang.textContent = item.textContent;
+            selectItems.classList.remove("show");
+            selectOptions.forEach((option) => {
+              option.classList.remove("selected");
+            });
+            item.classList.add("selected");
+            if (item.dataset.value === '{{ $.Language.Lang }}') {
+              return;
+            }
+            if (!langMap[item.dataset.value]) {
+              _$("#lang-tooltip").style.opacity = "1";
+              setTimeout(() => {
+                _$("#lang-tooltip").style.opacity = "0";
+              }, 1000);
+              return;
+            }
+            window.location = langMap[item.dataset.value];
+          });
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest(".custom-dropdown")) {
+            selectItems.classList.remove("show");
+            selectSelected.setAttribute("aria-expanded", "false");
+          }
+        });
+      </script>
+    </nav>
+  {{- end -}}
+  {{- if .Site.Params.triangle_badge.enable -}}
+    <a href="{{ .Site.Params.triangle_badge.link }}" class="triangle-badge" title="{{ .Site.Params.triangle_badge.icon }}" target="_blank" rel="noopener nofollow noreferrer">
+      <div class="icon icon-{{ .Site.Params.triangle_badge.icon }} triangle-badge-icon"></div>
+    </a>
+  {{- end -}}
+</div>
+<header id="header" aria-label="Site header">
+  <!-- Banner image removed by user request -->
+
+  <div id="header-outer">
+    <div id="header-title">
+        <style>
+            #logo h1 {
+                font-family: 'Press Start 2P', cursive !important;
+                font-size: 1.8rem !important; /* Adjusted to be smaller */
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                justify-content: center;
+                text-shadow: 2px 2px 0 #000;
+            }
+            .nyan-banner-icon {
+                height: 48px;
+                image-rendering: pixelated;
+            }
+            #subtitle {
+                 font-family: 'DotGothic16', sans-serif !important;
+                 /* text-shadow: 1px 1px 0 #000; */
+            }
+        </style>
+        
+      {{- if eq .Type "404" -}}
+        <a href="{{ "" | relLangURL }}" id="logo">
+          <h1 data-aos="{{ .Site.Params.animation.options.header.title }}">{{ i18n "not_found.title" }}</h1>
+        </a>
+      {{- else -}}
+        {{- $title := "" -}}
+        {{- if .IsHome -}}
+          {{- $title = .Site.Title -}}
+        {{- else if eq .Type "archives" -}}
+          {{- $title = "アーカイブ | Archives" -}}
+        {{- else if eq .Type "tags" -}}
+          {{- $title = "タグ | Tags" -}}
+        {{- else if eq .Type "categories" -}}
+          {{- $title = "カテゴリー | Categories" -}}
+        {{- else if .Title -}}
+          {{- $title = .Title -}}
+        {{- else -}}
+          {{- $title = .Site.Title -}}
+        {{- end -}}
+  
+        {{- if $title -}}
+          <span id="logo">
+            <h1 data-aos="{{ .Site.Params.animation.options.header.title }}">
+                {{ $title }}
+                <img class="nyan-banner-icon" src="https://media.tenor.com/-bKcw_wV3oAAAAAi/nyan-cat-nyan.gif" alt="nyan">
+            </h1>
+          </span>
+        {{- end -}}
+      {{- end -}}
+  
+      {{- if eq .Type "404" -}}
+        <h2 id="subtitle-wrap" data-aos="{{ .Site.Params.animation.options.header.subTitle }}">
+          <a href="{{ "" | relLangURL }}" id="subtitle">{{ i18n "not_found.subtitle" }}</a>
+        </h2>
+      {{- else -}}
+        {{- $subtitle := "" -}}
+        {{- if .IsHome -}}
+          {{- $subtitle = .Site.Params.subtitle | default .Site.Params.subtitle -}}
+        {{- else if and (eq .Type "categories") (not (eq .Title "Categories")) -}}
+          {{- $subtitle = .Title -}}
+        {{- else if and (eq .Type "tags") (not (eq .Title "Tags")) -}}
+          {{- $subtitle = .Title -}}
+        {{- else if and .Site.Params.summary.enable (eq .Site.Params.summary.style "subtitle") (in .Site.Params.mainSections .Type) -}}
+          {{- if .Summary -}}
+            {{- $subtitle = .Summary | plainify | truncate 200 -}}
+          {{- end -}}
+        {{- end -}}
+        <h2 id="subtitle-wrap" data-aos="{{ .Site.Params.animation.options.header.subTitle }}">
+          {{- if $subtitle -}}
+            <span id="subtitle">{{ $subtitle }}</span>
+          {{- end -}}
+        </h2>
+      {{- end -}}
+    </div>
+  </div>
+</header>

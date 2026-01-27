@@ -1,0 +1,881 @@
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, shrink-to-fit=no"
+/>
+{{- partial "head/init.html" . -}}
+{{- $title := .Title -}}
+{{- if .IsHome -}}
+  {{- $title = site.Title -}}
+{{- else if eq .Type "archives" -}}
+  {{- $title = printf "%s | %s" (i18n "archive_a") .Site.Params.author -}}
+{{- else if eq .Type "tags" -}}
+  {{- if eq .Title "Tags" -}}
+    {{- $title = printf "%s | %s" (i18n "tag") .Site.Params.author -}}
+  {{- else -}}
+    {{- $title = printf "%s | %s" .Title .Site.Params.author -}}
+  {{- end -}}
+{{- else if eq .Type "categories" -}}
+  {{- if eq .Title "Categories" -}}
+    {{- $title = printf "%s | %s" (i18n "category") .Site.Params.author -}}
+  {{- else -}}
+    {{- $title = printf "%s | %s" .Title .Site.Params.author -}}
+  {{- end -}}
+{{- else if .Title -}}
+  {{- $title = printf "%s | %s" .Title .Site.Params.author -}}
+{{- else -}}
+  {{- $title = printf "%s | %s" .Title .Site.Params.author -}}
+{{- end -}}
+<title>
+  {{ $title | safeHTML }}
+</title>
+<meta name="description" content="{{ .Params.description | default .Site.Params.description | safeHTML }}"/>
+{{- $keywords := default .Site.Params.keywords .Params.keywords -}}
+{{- with $keywords }}
+  {{- if reflect.IsSlice . }}
+    <meta name="keywords" content="{{ delimit . ", " }}" />
+  {{- else }}
+    <meta name="keywords" content="{{ . }}" />
+  {{- end }}
+{{- end }}
+{{- $site := .Site -}}
+{{- partialCached "head/analytics.html" . -}}
+{{- partialCached "head/config.html" . -}}
+
+{{- if .Site.Params.custom_font.enable -}}
+  {{- partialCached "helpers/vendorFont.html" . -}}
+{{- end -}}
+
+{{- if .Site.Params.font.enable -}}
+  {{- partialCached "helpers/vendorGoogleFont.html" . -}}
+{{- end -}}
+
+{{- $js := .Site.Data.vendor.js -}}
+{{- $css := .Site.Data.vendor.css -}}
+<!-- icon -->
+{{- if .Site.Params.icon_font -}}
+  <link
+    rel="preload"
+    href="//at.alicdn.com/t/c/font_{{ .Site.Params.icon_font }}.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin="anonymous"
+  />
+{{- else -}}
+  {{- range $css.fontawesome.high_priority -}}
+    {{- partial "helpers/css.html" (dict "raw" . "src" (index (partial "helpers/vendorCdn.html" (dict "item" . "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" .)) 0)) -}}
+  {{- end -}}
+  {{- range $css.fontawesome.low_priority -}}
+    {{- partial "helpers/asyncCss.html" (dict "raw" . "src" (index (partial "helpers/vendorCdn.html" (dict "item" . "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" .)) 0)) -}}
+  {{- end -}}
+{{- end -}}
+<!-- loader -->
+{{- if .Site.Params.preloader.enable -}}
+  {{- partial "helpers/scss.html" (dict "source" "css/loader.scss" "temp" "loader.scss" "target" "css/loader.css" "ctx" .) -}}
+{{- end -}}
+<!-- open-graph -->
+{{- if .Site.Params.open_graph.enable -}}
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{ $title | safeHTML }}" />
+  <meta
+    property="og:description"
+    content="{{ .Params.description | default .Site.Params.description | safeHTML }}"
+  />
+  <meta property="og:url" content="{{ .Permalink }}" />
+  <meta
+    property="og:site_name"
+    content="{{ .Site.Params.title | default .Site.Title | safeHTML }}"
+  />
+  <meta
+    property="og:image"
+    content="{{ (.Params.cover | relURL) | default (.Site.Params.banner | relURL) }}"
+  />
+  <meta property="article:author" content="{{ .Site.Params.author | safeHTML }}" />
+  <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05-07:00" }}" />
+  <meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}" />
+  {{- if .Params.tags -}}
+    <meta property="article:tag" content="{{ range .Params.tags }}{{ . }}{{ end }}" />
+  {{- end -}}
+  {{- $openGraphOptions := .Site.Params.open_graph.options -}}
+  <meta name="twitter:card" content="{{ $openGraphOptions.twitter_card | default "summary" }}" />
+  <meta name="twitter:image" content="{{ $openGraphOptions.twitter_image | default (.Params.cover | relURL) | default (.Site.Params.banner | relURL) }}" />
+  {{- if $openGraphOptions.twitter_site -}}
+    <meta name="twitter:site" content="{{ $openGraphOptions.twitter_site }}" />
+  {{- end -}}
+  {{- if $openGraphOptions.twitter_id -}}
+    <meta name="twitter:creator" content="{{ $openGraphOptions.twitter_id }}" />
+  {{- end -}}
+  {{- if $openGraphOptions.fb_app_id -}}
+    <meta property="fb:app_id" content="{{ $openGraphOptions.fb_app_id }}" />
+  {{- end -}}
+  {{- if $openGraphOptions.fb_admins -}}
+    <meta property="fb:admin_id" content="{{ $openGraphOptions.fb_admins }}" />
+  {{- end -}}
+  {{- if $openGraphOptions.google_plus -}}
+    <meta property="g+:profile_link" content="{{ $openGraphOptions.google_plus }}" />
+  {{- end -}}
+{{- end -}}
+<!-- rss -->
+{{- with .OutputFormats.Get "rss" -}}
+  {{- printf `<link rel=%q type=%q href=%q title=%q>` .Rel .MediaType.Type .Permalink site.Title | safeHTML -}}
+{{- end -}}
+<!-- favicon use default -->
+<link rel="shortcut icon" href="{{ "favicon.ico" | relURL }}">
+{{- partial "helpers/scss.html" (dict "source" "css/main.scss" "temp" "main.scss" "target" "css/main.css" "ctx" .) -}}
+<!-- photo-swipe -->
+{{- partial "helpers/asyncCss.html" (dict "raw" $css.photoswipe "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.photoswipe "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.photoswipe)) 0)) -}}
+<!-- katex -->
+{{- partial "helpers/asyncCss.html" (dict "raw" $css.katex "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.katex "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.katex)) 0)) -}}
+<!-- waline -->
+{{- if and .Site.Params.waline.enable .Site.Params.waline.serverURL -}}
+  {{- partial "helpers/css.html" (dict "raw" $css.waline "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.waline "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.waline)) 0)) -}}
+{{- end -}}
+<!-- gitalk -->
+{{- if and .Site.Params.gitalk.enable .Site.Params.gitalk.clientID .Site.Params.gitalk.clientSecret -}}
+  {{- partial "helpers/css.html" (dict "raw" $css.gitalk "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.gitalk "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.gitalk)) 0)) -}}
+{{- end -}}
+<!-- pace -->
+{{- if .Site.Params.pace.enable -}}
+  {{- partial "helpers/js.html" (dict "raw" $js.pace "src" (index (partial "helpers/vendorCdn.html" (dict "item" $js.pace "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $js.pace)) 0)) -}}
+{{- end -}}
+<!-- aos -->
+{{- if .Site.Params.animation.enable -}}
+  {{- partial "helpers/css.html" (dict "raw" $css.aos "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.aos "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.aos)) 0)) -}}
+{{- end -}}
+
+{{- if .Site.Params.player.aplayer.enable -}}
+  {{- partial "helpers/css.html" (dict "raw" $css.aplayer "src" (index (partial "helpers/vendorCdn.html" (dict "item" $css.aplayer "ctx" $site)) 0) "integrity" (index (partial "helpers/vendorCdnIntegrity.html" (dict "item" $css.aplayer)) 0)) -}}
+{{- end -}}
+
+<!-- Custom Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  .sidebar-author-name {
+    font-family: 'Press Start 2P', cursive !important;
+    font-size: 0.9rem !important;
+    margin-top: 12px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+  }
+  .sidebar-description {
+    font-family: 'DotGothic16', sans-serif !important;
+    font-size: 1rem !important;
+    text-align: center !important;
+    color: #8b949e !important;
+    margin-bottom: 12px !important;
+  }
+  
+    /* Widen sidebar to fit description in one line */
+    :root {
+      --sidebar-width: clamp(260px, 28vw, 320px) !important;
+    }
+    .sidebar-wrapper {
+      width: var(--sidebar-width) !important;
+      max-width: 100% !important;
+    }
+  .sidebar-wrap {
+      width: 100% !important;
+  }
+  
+  /* ADDED: Split sidebar and main content */
+  .sidebar-wrapper {
+      margin-right: 20px !important; /* Add gap between sidebar and main content */
+  }
+  #content.sidebar-left .sidebar-wrapper {
+      margin-right: 20px !important; /* Ensure gap specifically for left sidebar layout */
+  }
+    #content {
+      gap: 20px !important;
+    }
+
+  /* FIX: Prevent main content from overlapping with wider sidebar */
+  @media screen and (min-width: 960px) {
+    .sidebar-left #main {
+        max-width: calc(100% - var(--sidebar-width) - 40px) !important;
+        width: auto !important;
+        margin-left: 0 !important;
+    }
+    /* Keep sidebar aligned with content */
+    .sidebar-left #sidebar {
+        margin-left: 0 !important;
+    }
+  }
+
+  /* --- DARK THEME OVERRIDE (GitHub Dark-like) --- */
+  
+  [data-theme="dark"] {
+      /* Palette extraction from reference image */
+      --color-background: #0d1117 !important; /* Deep dark background */
+      --color-wrap: #161b22 !important;      /* Card background */
+      --color-font: #e6edf3 !important;      /* Light text */
+      --color-link: #58a6ff !important;      /* Blue accent */
+      --red-1: #58a6ff !important;           /* Override theme accents to Blue */
+      --red-3: #1f6feb !important;
+      
+        /* Sidebar specific */
+        --sidebar-width: clamp(260px, 28vw, 320px) !important;
+  }
+
+    /* 1. Global Background */
+    [data-theme="dark"] body {
+      background-image: url('/images/background.png') !important;
+      background-repeat: no-repeat !important;
+      background-attachment: fixed !important;
+      background-position: center center !important;
+      background-size: cover !important;
+      background-color: #0d1117 !important;
+  }
+    [data-theme="dark"] #container {
+      background: transparent !important;
+  }
+
+  /* 2. Card Styling (Unified) */
+  [data-theme="dark"] .post-wrap, 
+  [data-theme="dark"] .sidebar-wrap,
+  [data-theme="dark"] .sidebar-wrapper-container .sidebar-author, /* Ensure sidebar components match */
+  [data-theme="dark"] .post-categories-wrap {
+      background-color: #161b22 !important;
+      border: 1px solid #30363d !important; /* Subtle border */
+      border-radius: 12px !important;       /* Rounded corners */
+      box-shadow: none !important;          /* Remove block shadow */
+      margin-bottom: 20px !important;
+      transform: none !important;           /* Remove hover movement */
+  }
+      [data-theme="dark"] .post-wrap {
+        height: auto !important;
+        min-height: 232px !important;
+      }
+
+  /* Remove Alternating logic */
+  @media screen and (min-width: 960px) {
+    [data-theme="dark"] .post-wrap.left, [data-theme="dark"] .post-wrap.right {
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
+        flex-direction: row !important; /* Reset layout direction if needed */
+    }
+  }
+  
+  /* Text Coloring */
+    [data-theme="dark"] .post-title .post-title-link,
+    [data-theme="dark"] .sidebar-author-name,
+    [data-theme="dark"] .sidebar-description {
+      color: #e6edf3 !important;
+      text-shadow: none !important;
+  }
+    [data-theme="dark"] .post-meta,
+    [data-theme="dark"] .post-content,
+    [data-theme="dark"] .sidebar-state-number,
+    [data-theme="dark"] .sidebar-state div {
+      color: #8b949e !important; /* Muted grey text */
+  }
+
+  /* 3. Header Styling (Floating Look) */
+  [data-theme="dark"] #header-nav {
+      background: #161b22 !important;
+      border-bottom: 1px solid #30363d;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  [data-theme="dark"] .main-nav-link {
+       color: #e6edf3 !important;
+       font-family: inherit !important; /* Reset font to clean sans */
+       font-size: 1rem !important;
+       letter-spacing: normal !important;
+  }
+
+  /* 4. Sidebar Adjustments */
+    [data-theme="dark"] .sidebar-author {
+      background: #161b22 !important;
+      border: 1px solid #30363d !important;
+      border-radius: 16px !important;
+      padding: 16px 16px 14px 16px !important;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+      text-align: center !important;
+    }
+  
+  /* --- NEW SIDEBAR STYLING (Reference Match) --- */
+
+    /* A. Avatar: Rounded rectangle like reference */
+    [data-theme="dark"] .sidebar-author img {
+      border-radius: 14px !important;
+      width: 170px !important;
+      height: 170px !important;
+      object-fit: cover !important;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.35) !important;
+    }
+
+    /* B. Social Icons: Button Row look */
+      [data-theme="dark"] .sidebar-social {
+      width: 100% !important;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center !important;
+  }
+      [data-theme="dark"] .sidebar-social-icon {
+      width: 42px !important;
+      height: 42px !important;
+      background: #21262d !important;
+      border: 1px solid #30363d !important;
+      border-radius: 10px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+  }
+      [data-theme="dark"] .sidebar-social-icon:hover {
+      background: #30363d !important;
+      border-color: #8b949e !important;
+      transform: translateY(-2px);
+  }
+  /* Icon formatting within the button */
+    [data-theme="dark"] .sidebar-social-icon::before {
+      font-size: 20px !important;
+      color: #8b949e !important; /* Icon color */
+  }
+    [data-theme="dark"] .sidebar-social-icon:hover::before {
+      color: #e6edf3 !important; /* Hover color */
+  }
+  
+  /* Ensure Custom Icons appear */
+  [data-theme="dark"] .icon-check::before {
+      content: "\f00c" !important;
+      font-family: "Font Awesome 6 Free", FontAwesome, sans-serif !important;
+  }
+  
+  /* D. Sidebar Menu (Home, Archives, About) Buttons */
+    [data-theme="dark"] .sidebar-menu-link-wrap {
+      background: #21262d !important;
+      border: 1px solid #30363d !important;
+      border-radius: 6px !important;
+      margin-bottom: 8px !important;
+      padding: 0 16px !important;
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      transition: all 0.2s;
+  }
+    [data-theme="dark"] .sidebar-menu-link-wrap:hover {
+      background: #30363d !important;
+      border-color: #8b949e !important;
+      text-decoration: none !important;
+  }
+    [data-theme="dark"] .sidebar-menu-link, [data-theme="dark"] .sidebar-menu-icon {
+      color: #c9d1d9 !important;
+      font-weight: 500 !important;
+  }
+  /* Icon spacing */
+    [data-theme="dark"] .sidebar-menu-icon {
+      margin-right: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+  }
+
+    /* 7. Force Alternating Post Layout (Zig-Zag) - desktop only */
+    @media screen and (min-width: 960px) {
+    /* Odd posts (1st, 3rd...): Image Left, Text Right */
+    #main > .post-wrapper:nth-child(odd) .post-wrap {
+      flex-direction: row !important;
+    }
+    /* Even posts (2nd, 4th...): Image Right, Text Left */
+    #main > .post-wrapper:nth-child(even) .post-wrap {
+      flex-direction: row-reverse !important; 
+    }
+    
+    /* Text container adjustments */
+    /* Standard Left Alignment for Readability on ALL posts */
+    #main > .post-wrapper:nth-child(odd) .post-wrap .post-info {
+      text-align: left !important;
+      padding-left: 30px !important; /* Gap from Left Image */
+      padding-right: 20px !important;
+    }
+    #main > .post-wrapper:nth-child(even) .post-wrap .post-info {
+      text-align: left !important;
+      padding-right: 30px !important; /* Gap from Right Image */
+      padding-left: 20px !important;
+    }
+    }
+
+    /* Mobile/tablet: prevent card overlap and allow natural flow */
+    @media screen and (max-width: 959px) {
+    #content {
+      flex-direction: column !important;
+    }
+    .sidebar-wrapper,
+    #content.sidebar-left .sidebar-wrapper {
+      width: 100% !important;
+      margin-right: 0 !important;
+    }
+    .post-wrap {
+      flex-direction: column !important;
+      height: auto !important;
+    }
+    #main > .post-wrapper:nth-child(odd) .post-wrap,
+    #main > .post-wrapper:nth-child(even) .post-wrap {
+      flex-direction: column !important;
+    }
+    #main > .post-wrapper:nth-child(odd) .post-wrap .post-info,
+    #main > .post-wrapper:nth-child(even) .post-wrap .post-info {
+      padding: 16px !important;
+    }
+    .post-cover {
+      width: 100% !important;
+      height: 180px !important;
+    }
+    .post-title {
+      white-space: normal !important;
+    }
+    .sidebar-author img {
+      width: 140px !important;
+      height: 140px !important;
+      max-width: 100% !important;
+    }
+    }
+  
+  /* C. Categories Widget Styling */
+  [data-theme="dark"] .widget-title {
+      color: #e6edf3 !important;
+      font-weight: bold;
+      border-left: 3px solid #58a6ff; /* Blue accent line */
+      padding-left: 10px !important;
+  }
+  
+  /* 8. Darker Code Blocks (GitHub Style) */
+    [data-theme="dark"] {
+      --color-code-background: #0d1117 !important;
+      --highlight-background: #0d1117 !important;
+      --highlight-nav: #161b22 !important; /* Code block header/toolbar */
+  }
+  /* Force override for code blocks specifically */
+    [data-theme="dark"] .highlight,
+    [data-theme="dark"] pre,
+    [data-theme="dark"] code,
+    [data-theme="dark"] .code-block {
+      background-color: #0d1117 !important;
+  }
+    [data-theme="dark"] .category-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid #21262d;
+  }
+    [data-theme="dark"] .category-list-link {
+      color: #8b949e !important;
+      text-decoration: none;
+      transition: color 0.2s;
+  }
+    [data-theme="dark"] .category-list-link:hover {
+      color: #58a6ff !important;
+  }
+    [data-theme="dark"] .category-list-count {
+      background: #1f6feb !important; /* Blue pill */
+      color: #ffffff !important;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      min-width: 20px;
+      text-align: center;
+  }
+
+    /* Tags Widget Styling (match reference) */
+    [data-theme="dark"] .widget .tag-list {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      padding: 4px 2px !important;
+      margin: 0 !important;
+      list-style: none !important;
+    }
+    [data-theme="dark"] .widget .tag-item {
+      margin: 0 !important;
+    }
+    [data-theme="dark"] .widget .tag-link {
+      display: inline-block !important;
+      background: #21262d !important;
+      border: 1px solid #30363d !important;
+      color: #c9d1d9 !important;
+      padding: 6px 10px !important;
+      border-radius: 8px !important;
+      font-size: 0.85rem !important;
+      text-decoration: none !important;
+      transition: all 0.2s ease !important;
+    }
+    [data-theme="dark"] .widget .tag-link:hover {
+      background: #30363d !important;
+      border-color: #58a6ff !important;
+      color: #58a6ff !important;
+    }
+
+    /* Archives Tag Filter Active Highlight */
+    [data-theme="dark"] .archives-tag-list-item.active {
+      background: #e6edf3 !important;
+      box-shadow: none !important;
+    }
+    [data-theme="dark"] .archives-tag-list-item.active .archives-tag-list-link {
+      color: #0d1117 !important;
+      font-weight: 700 !important;
+    }
+
+  /* 5. Remove Banner Image & Collapse Header */
+    [data-theme="dark"] #header-nav > img, 
+    [data-theme="dark"] #header-nav > picture {
+      display: none !important;
+  }
+    [data-theme="dark"] #header-nav {
+      height: auto !important;
+      min-height: 0 !important;
+      background: rgba(13, 17, 23, 0.7) !important; /* Semi-transparent dark matching theme */
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      margin-bottom: 20px !important;
+  }
+
+  /* 9. Fix Search Popup Alignment */
+  /* Wrapper initially hidden to prevent layout shifts */
+  [data-theme="dark"] .site-search {
+      display: none;
+      z-index: 9999;
+  }
+
+  /* Popup Styles */
+    [data-theme="dark"] .popup {
+      position: fixed !important;
+      top: 100px !important; /* Just under the navbar */
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      margin: 0 !important;
+      background: rgba(13, 17, 23, 0.85) !important; /* Dark + translucent for blur */
+      border: 1px solid #30363d !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+      color: #c9d1d9 !important;
+      max-width: 900px !important;
+      width: 95% !important;
+      border-radius: 8px !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      
+      /* Ensure hidden state initially */
+      visibility: hidden !important;
+      opacity: 0 !important;
+      z-index: 9999 !important;
+      transition: opacity 0.3s ease !important;
+  }
+
+  /* Show State */
+  [data-theme="dark"] .popup.show {
+      visibility: visible !important;
+      opacity: 1 !important;
+  }
+  
+  /* Search Header/Input Area */
+    [data-theme="dark"] .reimu-search {
+      background: rgba(13, 17, 23, 0.7) !important; /* Match blurred popup */
+      border-bottom: 1px solid #30363d !important;
+      padding: 12px 16px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      border-radius: 8px 8px 0 0 !important;
+    }
+
+  [data-theme="dark"] .reimu-search-input-icon {
+      color: #58a6ff !important; /* Blue icon */
+      font-size: 1.2rem !important;
+  }
+
+    [data-theme="dark"] #reimu-search-input {
+      flex: 1 !important;
+      width: 100% !important;
+    }
+    [data-theme="dark"] #reimu-search-input input {
+      background: #161b22 !important; /* Darker input background */
+      border: 1px solid #30363d !important;
+      border-radius: 6px !important;
+      color: #c9d1d9 !important;
+      font-size: 16px !important;
+      padding: 8px 12px !important;
+      font-family: inherit !important;
+      width: 100% !important;
+  }
+  [data-theme="dark"] #reimu-search-input input:focus {
+      border-color: #58a6ff !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3) !important;
+  }
+  
+  /* Stats Line */
+  [data-theme="dark"] #reimu-stats {
+      padding: 10px 20px 5px 20px !important;
+      color: #8b949e !important; /* Muted blue-grey text */
+      font-size: 0.9rem !important;
+  }
+
+  /* Results List */
+  [data-theme="dark"] .reimu-hit-item {
+      padding: 10px 20px !important;
+      border-bottom: none !important; /* Clean list */
+  }
+  
+  [data-theme="dark"] .reimu-hit-item-link {
+      display: flex !important;
+      align-items: center !important;
+      text-decoration: none !important;
+      padding: 5px 0 !important;
+      transition: transform 0.2s ease !important;
+  }
+  
+  [data-theme="dark"] .reimu-hit-item-link:hover {
+      transform: translateX(5px) !important;
+  }
+
+  /* The Marker (Blue Bar/Square) */
+  [data-theme="dark"] .reimu-hit-marker {
+      width: 4px !important;
+      height: 14px !important;
+      background: #1f6feb !important; /* Blue Accent */
+      margin-right: 15px !important;
+      display: block !important;
+      box-shadow: 0 0 5px #1f6feb !important; /* Glowing effect */
+      border-radius: 2px !important;
+  }
+
+  [data-theme="dark"] .reimu-hit-item-title {
+      color: #58a6ff !important; /* Blue text */
+      font-size: 16px !important;
+      font-weight: normal !important;
+      margin: 0 !important;
+  }
+  
+  /* Close Button in Search */
+    [data-theme="dark"] .popup-btn-close {
+      color: #8b949e !important;
+      font-size: 20px !important;
+      border-left: 1px solid #30363d !important;
+      padding-left: 15px !important;
+      margin-left: 10px !important;
+      cursor: pointer !important;
+  }
+    [data-theme="dark"] .popup-btn-close:hover {
+      color: #ff7b72 !important; /* Red hover for close */
+  }
+
+      [data-theme="light"] .category-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        border-bottom: 1px solid #e6e6e6;
+      }
+      [data-theme="light"] .category-list-link {
+        color: #333333 !important;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      [data-theme="light"] .category-list-link:hover {
+        color: #111111 !important;
+      }
+      [data-theme="light"] .category-list-count {
+        background: #111111 !important;
+        color: #ffffff !important;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        min-width: 20px;
+        text-align: center;
+      }
+
+      [data-theme="light"] .widget .tag-list {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding: 4px 2px !important;
+        margin: 0 !important;
+        list-style: none !important;
+      }
+      [data-theme="light"] .widget .tag-item {
+        margin: 0 !important;
+      }
+      [data-theme="light"] .widget .tag-link {
+        display: inline-block !important;
+        background: #f6f6f6 !important;
+        border: 1px solid #e0e0e0 !important;
+        color: #111111 !important;
+        padding: 6px 10px !important;
+        border-radius: 8px !important;
+        font-size: 0.85rem !important;
+        text-decoration: none !important;
+        transition: all 0.2s ease !important;
+      }
+      [data-theme="light"] .widget .tag-link:hover {
+        background: #ededed !important;
+        border-color: #cfcfcf !important;
+        color: #111111 !important;
+      }
+
+      [data-theme="light"] .archives-tag-list-item.active {
+        background: #111111 !important;
+        box-shadow: none !important;
+      }
+      [data-theme="light"] .archives-tag-list-item.active .archives-tag-list-link {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+      }
+
+      [data-theme="light"] #header-nav > img,
+      [data-theme="light"] #header-nav > picture {
+        display: none !important;
+      }
+      [data-theme="light"] #header-nav {
+        height: auto !important;
+        min-height: 0 !important;
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        margin-bottom: 20px !important;
+      }
+
+      [data-theme="light"] .site-search {
+        display: none;
+        z-index: 9999;
+      }
+
+      [data-theme="light"] .popup {
+        position: fixed !important;
+        top: 100px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        margin: 0 !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid #e6e6e6 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12) !important;
+        color: #111111 !important;
+        max-width: 900px !important;
+        width: 95% !important;
+        border-radius: 8px !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        z-index: 9999 !important;
+        transition: opacity 0.3s ease !important;
+      }
+
+      [data-theme="light"] .popup.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      [data-theme="light"] .reimu-search {
+        background: rgba(255, 255, 255, 0.8) !important;
+        border-bottom: 1px solid #e6e6e6 !important;
+        padding: 12px 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        border-radius: 8px 8px 0 0 !important;
+      }
+
+      [data-theme="light"] .reimu-search-input-icon {
+        color: #111111 !important;
+        font-size: 1.2rem !important;
+      }
+
+      [data-theme="light"] #reimu-search-input {
+        flex: 1 !important;
+        width: 100% !important;
+      }
+
+      [data-theme="light"] #reimu-search-input input {
+        background: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 6px !important;
+        color: #111111 !important;
+        font-size: 16px !important;
+        padding: 8px 12px !important;
+        font-family: inherit !important;
+        width: 100% !important;
+      }
+
+      [data-theme="light"] #reimu-search-input input:focus {
+        border-color: #111111 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.12) !important;
+      }
+
+      [data-theme="light"] #reimu-stats {
+        padding: 10px 20px 5px 20px !important;
+        color: #333333 !important;
+        font-size: 0.9rem !important;
+      }
+
+      [data-theme="light"] .reimu-hit-item {
+        padding: 10px 20px !important;
+        border-bottom: none !important;
+      }
+
+      [data-theme="light"] .reimu-hit-item-link {
+        display: flex !important;
+        align-items: center !important;
+        text-decoration: none !important;
+        padding: 5px 0 !important;
+        transition: transform 0.2s ease !important;
+      }
+
+      [data-theme="light"] .reimu-hit-item-link:hover {
+        transform: translateX(5px) !important;
+      }
+
+      [data-theme="light"] .reimu-hit-marker {
+        width: 4px !important;
+        height: 14px !important;
+        background: #111111 !important;
+        margin-right: 15px !important;
+        display: block !important;
+        box-shadow: 0 0 5px rgba(0,0,0,0.35) !important;
+        border-radius: 2px !important;
+      }
+
+      [data-theme="light"] .reimu-hit-item-title {
+        color: #111111 !important;
+        font-size: 16px !important;
+        font-weight: normal !important;
+        margin: 0 !important;
+      }
+
+      [data-theme="light"] .popup-btn-close {
+        color: #333333 !important;
+        font-size: 20px !important;
+        border-left: 1px solid #e6e6e6 !important;
+        padding-left: 15px !important;
+        margin-left: 10px !important;
+        cursor: pointer !important;
+      }
+      [data-theme="light"] .popup-btn-close:hover {
+        color: #111111 !important;
+      }
+
+  
+  /* Hide the Anime Girl background in search if needed, or keep it subtle */
+    [data-theme="dark"] .reimu-bg {
+      display: none !important;
+    }
+  #header-outer {
+      padding: 100px 0 50px 0 !important; /* Adjust spacing for Title */
+  }
+
+  /* 6. Remove Dark Overlays/Containers */
+    [data-theme="dark"] #wrap,
+    [data-theme="dark"] #container,
+    [data-theme="dark"] .outer {
+      background: transparent !important;
+  }
+  /* The "mask" caused likely by ::before/after elements or specific overlay divs */
+    [data-theme="dark"] #mask {
+      display: none !important;
+  }
+
+</style>

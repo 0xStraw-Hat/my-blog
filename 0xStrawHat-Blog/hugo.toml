@@ -1,4 +1,7 @@
-baseURL = 'https://0xStrawHat.github.io/'
+baseURL = 'https://0xStra-wHat.github.io/'
 languageCode = 'en-us'
 title = '0xStrawHat Blog'
 theme= "hugo-theme-reimu"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

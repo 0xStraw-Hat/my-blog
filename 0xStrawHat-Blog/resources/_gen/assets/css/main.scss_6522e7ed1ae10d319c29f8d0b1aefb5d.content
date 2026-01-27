@@ -3,20 +3,20 @@
   --footer-icon: url(../images/taichi.png);
   --top-icon: url(../images/taichi.png);
   --sponsor-icon: url(../images/taichi.png);
-  --cursor-default: url(../images/cursor/reimu-cursor-default.png), auto;
-  --cursor-pointer: url(../images/cursor/reimu-cursor-pointer.png), pointer;
-  --cursor-text: url(../images/cursor/reimu-cursor-text.png), text;
+  --cursor-default: url(../images/cursor/jujutsu2.png), auto;
+  --cursor-pointer: url(../images/cursor/jujutsu1.png), pointer;
+  --cursor-text: url(../images/cursor/jujutsu2.png), text;
 }
 
 :root {
-  --red-0: #ff0000;
-  --red-1: #ff5252;
-  --red-2: #ff7c7c;
-  --red-3: #ffafaf;
-  --red-4: #ffd0d0;
-  --red-5: #ffecec;
-  --red-5-5: #fff3f3;
-  --red-6: #fff7f7;
+  --red-0: #4a0072;
+  --red-1: #7b1fa2;
+  --red-2: #9c27b0;
+  --red-3: #ba68c8;
+  --red-4: #e1bee7;
+  --red-5: #f3e5f5;
+  --red-5-5: #f8f1f9;
+  --red-6: #faf5fb;
   --grey-9: #888;
   --grey-7: var(--color-default);
   --color-archive-year: black;
@@ -34,8 +34,8 @@
   --color-meta-shadow: var(--red-6);
   --color-hover-shadow: rgba(120, 120, 120, 0.15);
   --color-h2-after: var(--red-1);
-  --color-red-6-shadow: rgba(255, 78, 78, 0.6);
-  --color-red-3-shadow: rgba(255, 78, 78, 0.3);
+  --color-red-6-shadow: rgba(123, 31, 162, 0.6);
+  --color-red-3-shadow: rgba(123, 31, 162, 0.3);
   --highlight-nav: #f5f5f5;
   --highlight-scrollbar: #d6d6d6;
   --highlight-background: #fdfdfd;
@@ -62,10 +62,10 @@
 
 [data-theme="dark"]:root {
   --red-0: var(--red-1);
-  --red-4: rgba(255, 208, 208, 0.5);
-  --red-5: rgba(255, 228, 228, 0.15);
-  --red-5-5: rgba(255, 236, 236, 0.05);
-  --red-6: rgba(255, 243, 243, 0.2);
+  --red-4: rgba(225, 190, 231, 0.5);
+  --red-5: rgba(243, 229, 245, 0.15);
+  --red-5-5: rgba(248, 241, 249, 0.05);
+  --red-6: rgba(250, 245, 251, 0.2);
   --color-archive-year: #999;
   --color-default: #999;
   --color-border: var(--red-5);
@@ -331,6 +331,14 @@ body [data-aos="zoom-in"] {
   content: "\e619";
 }
 
+.icon-linkedin:before {
+  content: "\e614";
+}
+
+.icon-discord:before {
+  content: "\e60d";
+}
+
 .sidebar-toc-btn:before {
   font-family: "iconfont";
   content: "\e633";
@@ -449,7 +457,7 @@ body {
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   text-size-adjust: 100%;
-  font-family: "Mulish", "Noto Serif SC", "Mulish", "Noto Serif SC", "-apple-system", "PingFang SC", "Microsoft YaHei", "sans-serif";
+  font-family: "JetBrains Mono", "Source Code Pro", "JetBrains Mono", "Source Code Pro", "-apple-system", "PingFang SC", "Microsoft YaHei", "sans-serif";
   transition: background 1s;
   color: var(--color-default);
   text-autospace: normal;
@@ -2684,6 +2692,38 @@ mjx-container::-webkit-scrollbar {
   }
 }
 
+#mobile-nav .mobile-nav-close {
+  position: sticky;
+  top: 12px;
+  margin: 12px 12px 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-font) 15%, transparent);
+  background: color-mix(in srgb, var(--color-mobile-nav-background) 85%, transparent);
+  color: var(--color-font);
+  font-size: 0;
+  line-height: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#mobile-nav .mobile-nav-close:hover {
+  background: color-mix(in srgb, var(--color-mobile-nav-background) 70%, transparent);
+}
+
+#mobile-nav .mobile-nav-close::before {
+  content: "";
+  width: 18px;
+  height: 12px;
+  background: linear-gradient(currentColor, currentColor) 0 0/100% 2px, linear-gradient(currentColor, currentColor) 0 5px/100% 2px, linear-gradient(currentColor, currentColor) 0 10px/100% 2px;
+  background-repeat: no-repeat;
+  display: block;
+}
+
 #mobile-nav .sidebar-wrap {
   background: var(--color-mobile-nav-background);
   max-height: calc(100vh - 100px);
@@ -3086,6 +3126,22 @@ mjx-container::-webkit-scrollbar {
 
 .sidebar-social-icon:hover {
   transform: scale(1.2);
+}
+
+.icon-github {
+  color: #191717;
+}
+
+[data-theme="dark"] .icon-github {
+  color: #bc88ff;
+}
+
+.icon-linkedin {
+  color: #0e76a8;
+}
+
+.icon-discord {
+  color: #7289da;
 }
 
 .sidebar-menu {
