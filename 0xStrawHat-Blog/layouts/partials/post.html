@@ -19,7 +19,6 @@
         target="_blank"
         rel="noopener nofollow noreferrer"
         aria-label="{{ $page.Title }}"
-        title="{{ $page.Title }}"
       >
       </a>
     {{- else -}}
@@ -27,7 +26,6 @@
         class="post-link"
         href="{{ $page.Permalink | relURL }}"
         aria-label="{{ $page.Title }}"
-        title="{{ $page.Title }}"
       >
       </a>
     {{- end -}}
