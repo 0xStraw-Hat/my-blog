@@ -28,7 +28,7 @@ email: xxx@example.com
 description: "クラッシュをコントロールに変える"
 subtitle: "クラッシュをコントロールに変える"
 
-banner: "images/banner.webp"
+banner: "images/background.jpg"
 # You can also write it in the form of the following url
 # banner: "https://example.com"
 
@@ -36,11 +36,11 @@ banner: "images/banner.webp"
 banner_srcset:
   enable: false
   srcset:
-    - src: "images/banner-600w.webp"
+    - src: "images/background.jpg"
       media: "(max-width: 479px)"
-    - src: "images/banner-800w.webp"
+    - src: "images/background.jpg"
       media: "(max-width: 799px)"
-    - src: "images/banner.webp"
+    - src: "images/background.jpg"
       media: "(min-width: 800px)"
 
 avatar: "avatar.jpg"

@@ -170,12 +170,28 @@
 
   /* Cool font for post title + description */
   .post-title {
-    font-family: 'Press Start 2P', cursive !important;
-    letter-spacing: 0.5px !important;
+    font-family: inherit !important;
+    font-size: 1.12rem !important;
+    line-height: 1.35 !important;
+    letter-spacing: normal !important;
+  }
+
+  /* Header/banner page title (beats theme's `#logo h1 { font-size: 1.8rem !important; }`) */
+  #header-title #logo h1 {
+    font-size: 1.0rem !important;
+    line-height: 1.25 !important;
+  }
+
+  @media screen and (max-width: 479px) {
+    #header-title #logo h1 {
+      font-size: 0.85rem !important;
+    }
   }
   .post-article {
-    font-family: 'DotGothic16', sans-serif !important;
+    font-family: inherit !important;
     font-style: italic !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
   }
   
     /* Widen sidebar to fit description in one line */
@@ -239,16 +255,22 @@
       background-color: #0d1117 !important;
       position: relative !important;
     }
-    [data-theme="dark"] body::before {
+    /* Full-site background (all pages) */
+    body::before {
       content: "";
       position: fixed;
       inset: 0;
       background: url('/images/background.jpg') center/cover no-repeat fixed;
-      filter: blur(3px);
       transform: scale(1.01);
-      opacity: 0.88;
-      z-index: -1;
+      z-index: -10;
       pointer-events: none;
+      opacity: 0.35;
+    }
+
+    /* Slightly stronger in dark theme for readability */
+    [data-theme="dark"] body::before {
+      filter: blur(3px);
+      opacity: 0.88;
     }
     [data-theme="dark"] #container {
       background: transparent !important;
@@ -966,11 +988,11 @@
       padding: 100px 0 50px 0 !important; /* Adjust spacing for Title */
   }
 
-  /* 6. Remove Dark Overlays/Containers */
-    [data-theme="dark"] #wrap,
-    [data-theme="dark"] #container,
-    [data-theme="dark"] .outer {
-      background: transparent !important;
+  /* Ensure wrappers don't paint over the background image */
+  #wrap,
+  #container,
+  .outer {
+    background: transparent !important;
   }
   /* The "mask" caused likely by ::before/after elements or specific overlay divs */
     [data-theme="dark"] #mask {

@@ -105,7 +105,17 @@
   {{- end -}}
 </div>
 <header id="header" aria-label="Site header">
-  <!-- Banner image removed by user request -->
+  {{- if in .Site.Params.mainSections .Type -}}
+    <picture></picture>
+  {{- else if and .Params.cover (strings.HasPrefix .Params.cover "rgb") -}}
+    <picture></picture>
+    <img style="position: absolute;top: 0;left: 0;width: 100%;height: 180%;z-index: -2;display: block;background: {{ .Params.cover | safeCSS }};mask: linear-gradient(to top, transparent, #fff 50%);"></img>
+  {{- else if .Params.cover -}}
+    <picture></picture>
+    <img {{ if .Site.Params.material_theme.enable }}crossorigin="anonymous"{{ end }} fetchpriority="high" src="{{ .Params.cover | relURL }}" alt="{{ .Title }}">
+  {{- else -}}
+    <picture></picture>
+  {{- end -}}
 
   <div id="header-outer">
     <div id="header-title">

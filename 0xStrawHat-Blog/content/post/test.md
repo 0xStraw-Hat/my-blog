@@ -1,10 +1,11 @@
 +++
 date = '2026-01-27T18:59:18+02:00'
-draft = false
+draft = true
 title = 'Test'
 tags = ["test", "test2"]
 cover = "posts-cover/cat25.gif"
 description = "hello world hello  "
+categories = ["Notes"]
 +++
 
 
