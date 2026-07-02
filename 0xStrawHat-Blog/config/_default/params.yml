@@ -582,28 +582,15 @@ home_categories:
 # Inject code snippet
 # Make sure your code snippet is safeHTML
 injector:
-  head_begin: # Inject code snippet right after <head>
-  head_end: |
+  head_begin: |
+    <script>
+      localStorage.setItem("dark_mode", "true");
+      document.documentElement.setAttribute("data-theme", "dark");
+    </script>
     <style>
-      html, body, #container, #wrap, #main, #content { 
-        background: transparent !important; 
-      }
-      #header img {
-        position: fixed !important;
-        height: 100vh !important;
-        width: 100vw !important;
-        object-fit: cover !important;
-        -webkit-mask: none !important;
-        mask: none !important;
-        z-index: -3 !important;
-      }
-      :root, [data-theme="dark"], [data-theme-mode="true"] {
-        --color-wrap: rgba(33, 37, 43, 0.7) !important;
-      }
-      [data-theme="light"], [data-theme-mode="false"] {
-        --color-wrap: rgba(255, 255, 255, 0.7) !important;
-      }
+      .dark-mode-btn { display: none !important; }
     </style>
+  head_end: # Inject code snippet right before </head>
   body_begin: # Inject code snippet right after <body>
   body_end: # Inject code snippet right before </body>
   sidebar_begin: # Inject code snippet right after <aside>
