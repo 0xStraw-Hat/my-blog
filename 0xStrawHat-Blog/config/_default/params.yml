@@ -28,7 +28,7 @@ email: xxx@example.com
 description: "クラッシュをコントロールに変える"
 subtitle: "クラッシュをコントロールに変える"
 
-banner: "images/background.jpg"
+banner: false
 # You can also write it in the form of the following url
 # banner: "https://example.com"
 
@@ -81,10 +81,10 @@ copyright:
 #   All website licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a></div>
 
 footer:
-  since: 2020 # 2020-current year
+  since: 2026 # 2020-current year
   powered: false
-  count: true
-  busuanzi: true
+  count: false
+  busuanzi: false
   icon:
     url: "../images/taichi.png" # this path is relative to the css/main.css, so it needs to go up one level to reach the images folder
     rotate: true
@@ -583,21 +583,7 @@ home_categories:
 # Make sure your code snippet is safeHTML
 injector:
   head_begin: # Inject code snippet right after <head>
-  head_end: |
-    <style>
-      html, body, #container, #wrap, #main, #content { 
-        background: transparent !important; 
-      }
-      #header img {
-        position: fixed !important;
-        height: 100vh !important;
-        width: 100vw !important;
-        object-fit: cover !important;
-        -webkit-mask: none !important;
-        mask: none !important;
-        z-index: -3 !important;
-      }
-    </style>
+  head_end: # Inject code snippet right before </head>
   body_begin: # Inject code snippet right after <body>
   body_end: # Inject code snippet right before </body>
   sidebar_begin: # Inject code snippet right after <aside>
